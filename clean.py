@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 credit = pd.read_csv('credit_risk_dataset.csv')
 
-credit.dropna(subset=['loan_int_rate'], inplace=True)
+credit.dropna(inplace=True)
 
 home_ownership_map = {
     "RENT": 1,
@@ -14,6 +14,8 @@ home_ownership_map = {
     "OWN": 3
 }
 credit['person_home_ownership'] = credit['person_home_ownership'].map(home_ownership_map)
+
+credit = credit.loc[credit['person_income'] < 500000]
 
 credit.dropna(inplace=True)
 
@@ -27,13 +29,8 @@ loan_intent_map = {
     "HOMEIMPROVEMENT": 5,
     "DEBTCONSOLIDATION": 6
 }
+
 credit['loan_intent'] = credit['loan_intent'].map(loan_intent_map)
-
-# Drop loan_status
-credit.drop(columns=['loan_status'], inplace=True)
-
-# Drop any rows with remaining NaNs after mapping
-credit.dropna(inplace=True)
 
 # Save cleaned data
 credit.to_csv('clean_risk.csv', index=False)
@@ -60,21 +57,21 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-kmeans = KMeans(n_clusters=5, random_state=28)
+kmeans = KMeans(n_clusters=4, random_state=345)
 kmeans.fit(credit_numeric)
 labels = kmeans.labels_
 
 print(pd.Series(labels).value_counts())
 
-new_person = [35,60000,1.0,1.1,0,20000,12.01,0.33,1,0]
+new_person = [35,60000,1.0,1.1,0,20000,12.01,0.33,1,1,0]
 new_person_array = np.array(new_person).reshape(1, -1)
 predicted_cluster = kmeans.predict(new_person_array)
 print(predicted_cluster[0])
 
 
-x_col = credit.columns[6]
-y_col = credit.columns[5]
-z_col = credit.columns[1]
+x_col = credit.columns[5]
+y_col = credit.columns[1]
+z_col = credit.columns[6]
 
 x_index = credit_numeric.columns.get_loc(x_col)
 y_index = credit_numeric.columns.get_loc(y_col)
@@ -92,7 +89,7 @@ for i in range(5):
         credit[labels == i][z_col],
         c=colors[i],
         label=f'Cluster {i}',
-        alpha=0.5
+        alpha=0.25
     )
 
 # Plot centroids
@@ -108,7 +105,7 @@ ax.scatter(
 ax.set_xlabel(x_col)
 ax.set_ylabel(y_col)
 ax.set_zlabel(z_col)
-ax.set_zlim(0, 2000000)
+ax.set_zlim(0, 30)
 ax.set_title('3D KMeans Clustering of Credit Risk Data')
 ax.legend()
 plt.tight_layout()

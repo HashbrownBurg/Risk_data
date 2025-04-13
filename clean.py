@@ -21,16 +21,18 @@ credit.dropna(inplace=True)
 
 credit['cb_person_default_on_file'] = credit['cb_person_default_on_file'].map({'N': 0, 'Y': 1})
 
-loan_intent_map = {
-    "PERSONAL": 1,
-    "EDUCATION": 2,
-    "MEDICAL": 3,
-    "VENTURE": 4,
-    "HOMEIMPROVEMENT": 5,
-    "DEBTCONSOLIDATION": 6
-}
+# loan_intent_map = {
+#     "PERSONAL": 1,
+#     "EDUCATION": 2,
+#     "MEDICAL": 3,
+#     "VENTURE": 4,
+#     "HOMEIMPROVEMENT": 5,
+#     "DEBTCONSOLIDATION": 6
+# }
 
-credit['loan_intent'] = credit['loan_intent'].map(loan_intent_map)
+# credit['loan_intent'] = credit['loan_intent'].map(loan_intent_map)
+
+credit.drop(columns='loan_intent', inplace=True)
 
 # Save cleaned data
 credit.to_csv('clean_risk.csv', index=False)
@@ -63,7 +65,7 @@ labels = kmeans.labels_
 
 print(pd.Series(labels).value_counts())
 
-new_person = [35,60000,1.0,1.1,0,20000,12.01,0.33,1,1,0]
+new_person = [35,60000,1.0,1.1,20000,12.01,0.33,1,1,0]
 new_person_array = np.array(new_person).reshape(1, -1)
 predicted_cluster = kmeans.predict(new_person_array)
 print(predicted_cluster[0])
